@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.token;
+package edu.cnm.deepdive.math;
 
 public interface NumberValue<T extends NumberValue> {
   T add(T rhs);

@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.token;
+package edu.cnm.deepdive.math;
 
 public class Real implements NumberValue<Real> {
 

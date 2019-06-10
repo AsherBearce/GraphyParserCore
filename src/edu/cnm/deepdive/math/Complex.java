@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.token;
+package edu.cnm.deepdive.math;
 
 public class Complex implements NumberValue<Complex> {
 

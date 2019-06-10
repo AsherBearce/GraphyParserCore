@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.token;
+package edu.cnm.deepdive.math;
 
 public class Dual implements NumberValue<Dual> {
   private final double real;

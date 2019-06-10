@@ -1,5 +1,7 @@
 package edu.cnm.deepdive.token;
 
+import edu.cnm.deepdive.math.NumberValue;
+
 public class NumberToken implements Token {
 
   private final NumberValue value;

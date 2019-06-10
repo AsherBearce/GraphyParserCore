@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.token;
+package edu.cnm.deepdive.math;
 
 public class ComplexDual implements NumberValue<ComplexDual> {
   //Quick note, this is viewed as being a + bi where a, b are dual numbers.

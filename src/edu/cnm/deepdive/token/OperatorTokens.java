@@ -1,5 +1,7 @@
 package edu.cnm.deepdive.token;
 
+import edu.cnm.deepdive.math.NumberValue;
+
 public enum OperatorTokens implements Token, Operator {
   PLUS((NumberValue lhs, NumberValue rhs)-> lhs.add(rhs),
       (NumberValue lhs, NumberValue rhs)-> rhs, 1, 0, true),
