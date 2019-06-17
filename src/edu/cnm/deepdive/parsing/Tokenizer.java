@@ -52,6 +52,10 @@ public final class Tokenizer {
           result.addLast(OperatorTokens.MULTIPLY);
           break;
         }
+        case '^': {
+          result.addLast(OperatorTokens.EXPONENT);
+          break;
+        }
         case '/': {
           result.addLast(OperatorTokens.DIVIDE);
           break;

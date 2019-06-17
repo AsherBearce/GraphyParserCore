@@ -17,7 +17,6 @@ public class ComputeEnvironment {
   }
 
   private Token nextToken(){
-    System.out.println(currentToken.value.getTokenType());
     currentToken = currentToken.next;
     return currentToken.value;
   }
@@ -30,20 +29,22 @@ public class ComputeEnvironment {
       nextToken();
     }
     else if (currentToken.value.getTokenType() == TokenTypes.OPEN_PAREN){
-      result = computeExpression(1);
+      nextToken();
+      result = computeExpression(0);
       expectToken(TokenTypes.CLOSE_PAREN);
+      nextToken();
     }
     else{
-      //It's an operator
-      //We won't handle these yet
-      result = null;
+      OperatorTokens operator = (OperatorTokens)currentToken.value;
+      nextToken();
+      result = operator.computeUnaryOperation(computeExpression(0));
     }
 
     return result;
   }
 
   private void expectToken(Token expected) throws UnexpectedTokenException{
-    if (expected.getTokenType() != nextToken().getTokenType()){
+    if (expected.getTokenType() !=  currentToken.value.getTokenType()){
       throw new UnexpectedTokenException("Expected " + expected.getTokenType() + ", got "
           + currentToken.value.getTokenType());
     }
@@ -68,8 +69,7 @@ public class ComputeEnvironment {
 
       nextToken();
       NumberValue<?> rhs = computeExpression(nextMinPrec);
-      result = operator.computeOperation(result, rhs);
-      System.out.println(operator);
+      result = operator.computeBinaryOperation(result, rhs);
     }
 
     //expectToken(TokenTypes.END);

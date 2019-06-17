@@ -1,6 +1,7 @@
 package edu.cnm.deepdive.token;
 
 import edu.cnm.deepdive.math.NumberValue;
+import org.omg.CORBA.PUBLIC_MEMBER;
 
 public enum OperatorTokens implements Token, Operator {
   PLUS((NumberValue lhs, NumberValue rhs)-> lhs.add(rhs),
@@ -35,8 +36,13 @@ public enum OperatorTokens implements Token, Operator {
   }
 
   @Override
-  public NumberValue computeOperation(NumberValue lhs, NumberValue rhs) {
+  public NumberValue computeBinaryOperation(NumberValue lhs, NumberValue rhs) {
     return binaryOperation.compute(lhs, rhs);//TODO This needs to take in to account unary operations
+  }
+
+  @Override
+  public NumberValue computeUnaryOperation(NumberValue rhs){
+    return unaryOperation.compute(rhs, rhs);
   }
 
   @Override

@@ -11,7 +11,7 @@ import java.util.LinkedList;
 public class ParsingTest {
 
   public static void main(String[] args) throws UnexpectedTokenException{
-    String toParse = "10 + 2 * 3 * 4";//TODO fix parenthesis parsing
+    String toParse = "-*(10 + 3)";
     LinkedList<Token> tokens = new Tokenizer(toParse).Tokenize();
     ComputeEnvironment env = new ComputeEnvironment(tokens);
 
