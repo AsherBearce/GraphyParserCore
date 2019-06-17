@@ -16,6 +16,10 @@ public class TokenList {
     return last;
   }
 
+  public TokenContainer getFirst(){
+    return first;
+  }
+
   public TokenList(LinkedList<Token> from){
     for (Token t : from){
       addLast(t);

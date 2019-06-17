@@ -36,12 +36,7 @@ public enum OperatorTokens implements Token, Operator {
 
   @Override
   public NumberValue computeOperation(NumberValue lhs, NumberValue rhs) {
-    if (binary) {
-      return binaryOperation.compute(lhs, rhs);
-    }
-    else{
-      return unaryOperation.compute(lhs, rhs);
-    }
+    return binaryOperation.compute(lhs, rhs);//TODO This needs to take in to account unary operations
   }
 
   @Override

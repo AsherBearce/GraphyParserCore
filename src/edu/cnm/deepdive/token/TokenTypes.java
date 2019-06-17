@@ -7,7 +7,8 @@ public enum TokenTypes implements Token {
   OPEN_PAREN,
   CLOSE_PAREN,
   OPEN_CURLY,
-  CLOSE_CURLY;
+  CLOSE_CURLY,
+  END;
 
   @Override
   public TokenTypes getTokenType() {

@@ -1,8 +1,10 @@
 package edu.cnm.deepdive.parsing;
 
 import edu.cnm.deepdive.math.NumberValue;
-import edu.cnm.deepdive.math.Real;
+import edu.cnm.deepdive.token.NumberToken;
+import edu.cnm.deepdive.token.OperatorTokens;
 import edu.cnm.deepdive.token.Token;
+import edu.cnm.deepdive.token.TokenTypes;
 import java.util.LinkedList;
 
 public class ComputeEnvironment {
@@ -11,23 +13,67 @@ public class ComputeEnvironment {
 
   public ComputeEnvironment(LinkedList<Token> tokens){
     this.tokens = new TokenList(tokens);
-    currentToken = this.tokens.getLast();
+    currentToken = this.tokens.getFirst();
   }
 
   private Token nextToken(){
+    System.out.println(currentToken.value.getTokenType());
     currentToken = currentToken.next;
     return currentToken.value;
   }
 
-  private NumberValue<?> computeAtom(){
-    return null;
+  private NumberValue<?> computeAtom() throws UnexpectedTokenException{
+    NumberValue<?> result;
+
+    if (currentToken.value.getTokenType() == TokenTypes.NUMBER){
+      result = ((NumberToken)currentToken.value).getValue();
+      nextToken();
+    }
+    else if (currentToken.value.getTokenType() == TokenTypes.OPEN_PAREN){
+      result = computeExpression(1);
+      expectToken(TokenTypes.CLOSE_PAREN);
+    }
+    else{
+      //It's an operator
+      //We won't handle these yet
+      result = null;
+    }
+
+    return result;
   }
 
-  private boolean expectToken(Token expected){
-    return expected.getTokenType() == currentToken.value.getTokenType();
+  private void expectToken(Token expected) throws UnexpectedTokenException{
+    if (expected.getTokenType() != nextToken().getTokenType()){
+      throw new UnexpectedTokenException("Expected " + expected.getTokenType() + ", got "
+          + currentToken.value.getTokenType());
+    }
   }
 
-  public NumberValue<?> computeExpression(){
-    return null;
+  public NumberValue<?> computeExpression(int minPrecedence) throws UnexpectedTokenException{
+    NumberValue<?> result = computeAtom();
+    //nextToken();
+
+    while (currentToken.value.getTokenType() == TokenTypes.OPERATOR &&
+        ((OperatorTokens)currentToken.value).getPrecedence() >= minPrecedence){
+      OperatorTokens operator = (OperatorTokens)currentToken.value;
+      int prec = operator.getPrecedence();
+      boolean isLeftAssociative = operator.isLeftAssociative();
+      int nextMinPrec;
+
+      if (isLeftAssociative){
+        nextMinPrec = prec + 1;
+      }else{
+        nextMinPrec = prec;
+      }
+
+      nextToken();
+      NumberValue<?> rhs = computeExpression(nextMinPrec);
+      result = operator.computeOperation(result, rhs);
+      System.out.println(operator);
+    }
+
+    //expectToken(TokenTypes.END);
+
+    return result;
   }
 }

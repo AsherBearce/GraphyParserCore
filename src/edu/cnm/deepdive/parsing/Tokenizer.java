@@ -96,7 +96,13 @@ public final class Tokenizer {
           result.addLast(new NumberToken(new Real(parsedValue)));
         }
       }
+
+      if (result.getLast().getTokenType() != TokenTypes.NUMBER){
+        currentCharacter = nextChar();
+      }
     }
+
+    result.addLast(TokenTypes.END);
 
     return result;
   }
