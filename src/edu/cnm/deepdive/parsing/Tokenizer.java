@@ -1,7 +1,9 @@
 package edu.cnm.deepdive.parsing;
 
 import edu.cnm.deepdive.math.Real;
+import edu.cnm.deepdive.token.IdentifierToken;
 import edu.cnm.deepdive.token.NumberToken;
+import edu.cnm.deepdive.token.Operator;
 import edu.cnm.deepdive.token.OperatorTokens;
 import edu.cnm.deepdive.token.Token;
 import edu.cnm.deepdive.token.TokenTypes;
@@ -60,6 +62,10 @@ public final class Tokenizer {
           result.addLast(OperatorTokens.DIVIDE);
           break;
         }
+        case '=':{
+          result.addLast(TokenTypes.EQUALS);
+          break;
+        }
         case '(': {
           result.addLast(TokenTypes.OPEN_PAREN);
           break;
@@ -99,9 +105,22 @@ public final class Tokenizer {
 
           result.addLast(new NumberToken(new Real(parsedValue)));
         }
+        default: {
+          int charCount = 0;
+
+          while (hasNext() && Character.isAlphabetic(currentCharacter)){
+            charCount++;
+            currentCharacter = nextChar();
+          }
+
+          String identifier = toTokenize.substring(currentIndex - charCount, currentIndex);
+          result.addLast(new IdentifierToken(identifier));
+          break;
+        }
       }
 
-      if (result.getLast().getTokenType() != TokenTypes.NUMBER){
+      if (result.getLast().getTokenType() != TokenTypes.NUMBER &&
+          result.getLast().getTokenType() != TokenTypes.IDENTIFIER){
         currentCharacter = nextChar();
       }
     }

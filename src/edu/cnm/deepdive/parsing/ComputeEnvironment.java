@@ -1,79 +1,52 @@
 package edu.cnm.deepdive.parsing;
 
 import edu.cnm.deepdive.math.NumberValue;
+import edu.cnm.deepdive.token.IdentifierToken;
 import edu.cnm.deepdive.token.NumberToken;
 import edu.cnm.deepdive.token.OperatorTokens;
 import edu.cnm.deepdive.token.Token;
 import edu.cnm.deepdive.token.TokenTypes;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class ComputeEnvironment {
   private TokenList.TokenContainer currentToken;
   private TokenList tokens;
+  private HashMap<String, Function> functions;
+  private HashMap<String, NumberValue<?>> variables;
 
   public ComputeEnvironment(LinkedList<Token> tokens){
     this.tokens = new TokenList(tokens);
     currentToken = this.tokens.getFirst();
+    functions = new HashMap<>();
+    variables = new HashMap<>();
   }
 
-  private Token nextToken(){
-    currentToken = currentToken.next;
-    return currentToken.value;
-  }
-
-  private NumberValue<?> computeAtom() throws UnexpectedTokenException{
+  public NumberValue<?> getVariable(String identifier){
     NumberValue<?> result;
 
-    if (currentToken.value.getTokenType() == TokenTypes.NUMBER){
-      result = ((NumberToken)currentToken.value).getValue();
-      nextToken();
-    }
-    else if (currentToken.value.getTokenType() == TokenTypes.OPEN_PAREN){
-      nextToken();
-      result = computeExpression(0);
-      expectToken(TokenTypes.CLOSE_PAREN);
-      nextToken();
+    if (variables.containsKey(identifier)){
+      result = null;
     }
     else{
-      OperatorTokens operator = (OperatorTokens)currentToken.value;
-      nextToken();
-      result = operator.computeUnaryOperation(computeExpression(0));
+      result = variables.get(identifier);
     }
 
     return result;
   }
 
-  private void expectToken(Token expected) throws UnexpectedTokenException{
-    if (expected.getTokenType() !=  currentToken.value.getTokenType()){
-      throw new UnexpectedTokenException("Expected " + expected.getTokenType() + ", got "
-          + currentToken.value.getTokenType());
-    }
-  }
-
-  public NumberValue<?> computeExpression(int minPrecedence) throws UnexpectedTokenException{
-    NumberValue<?> result = computeAtom();
-    //nextToken();
-
-    while (currentToken.value.getTokenType() == TokenTypes.OPERATOR &&
-        ((OperatorTokens)currentToken.value).getPrecedence() >= minPrecedence){
-      OperatorTokens operator = (OperatorTokens)currentToken.value;
-      int prec = operator.getPrecedence();
-      boolean isLeftAssociative = operator.isLeftAssociative();
-      int nextMinPrec;
-
-      if (isLeftAssociative){
-        nextMinPrec = prec + 1;
-      }else{
-        nextMinPrec = prec;
+  public void ParseStatement() throws UnexpectedTokenException{
+    if (currentToken.value.getTokenType() == TokenTypes.IDENTIFIER){
+      String identifierName = ((IdentifierToken) currentToken.value).getValue();
+      if (functions.containsKey(identifierName) || variables.containsKey(identifierName)){
+        //Do a compute expression, not sure where to put it.
       }
-
-      nextToken();
-      NumberValue<?> rhs = computeExpression(nextMinPrec);
-      result = operator.computeBinaryOperation(result, rhs);
+      else{
+        //Other wise, we're declaring either a new variable or function.
+      }
     }
+    else{
 
-    //expectToken(TokenTypes.END);
-
-    return result;
+    }
   }
 }

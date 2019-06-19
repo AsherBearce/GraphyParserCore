@@ -8,6 +8,13 @@ public enum TokenTypes implements Token {
   CLOSE_PAREN,
   OPEN_CURLY,
   CLOSE_CURLY,
+  COMMA,
+  COLON,
+  EQUALS,
+  LESS_THAN,
+  GREATER_THAN,
+  LESS_THAN_EQUAL,
+  GREATER_THAN_EQUAL,
   END;
 
   @Override
