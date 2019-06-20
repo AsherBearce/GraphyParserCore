@@ -15,15 +15,21 @@ import java.util.LinkedList;
 public class ParsingTest {
 
   public static void main(String[] args) throws ParseException {
-    String toParse = "x ^ 2";
+    String toParse = "log(x)";
     LinkedList<Token> tokens = new Tokenizer(toParse).Tokenize();
+
+    for (Token t : tokens){
+      System.out.println(t);
+    }
+
     HashMap<String, Integer> params = new HashMap<>();
     params.put("x", 0);
-    Function func = new Function("a", tokens, 1, null, params);
+    Function func = new Function("a", tokens, 1, new ComputeEnvironment(), params);
 
     Real arg = new Real(5);
 
     NumberValue<Real> result = func.invoke(arg);
+    //System.out.println(result);
 
     System.out.println(((Real)result).getValue());
   }

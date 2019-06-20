@@ -1,5 +1,6 @@
 package edu.cnm.deepdive.parsing;
 
+import edu.cnm.deepdive.math.Complex;
 import edu.cnm.deepdive.math.NumberValue;
 import edu.cnm.deepdive.token.IdentifierToken;
 import edu.cnm.deepdive.token.NumberToken;
@@ -77,11 +78,58 @@ public class Function {
       String identifierName = ((IdentifierToken) currentToken.value).getValue();
       if (nextToken().getTokenType() == TokenTypes.OPEN_PAREN){
         //Calling a function within an expression.
-        result = null;
+        if (env != null && env.getFunction(identifierName) != null){
+          //Get all the arguments for this guy.
+          Function func = env.getFunction(identifierName);
+          NumberValue[] args = new NumberValue[func.getNumArgs()];
+          int argNum = 0;
+
+          /*while (currentToken.value.getTokenType() == TokenTypes.NUMBER ||
+            currentToken.value.getTokenType() == TokenTypes.IDENTIFIER){
+            args[argNum] = computeExpression(0);
+            nextToken();
+            expectToken(TokenTypes.COMMA);
+            nextToken();
+            argNum++;
+          }*/
+
+          result = env.getFunction(identifierName).invoke(args);
+        }
+        else if (ComputeEnvironment.builtIn.containsKey(identifierName)){
+          //Check if the function is part of the built in functions
+          nextToken();
+
+          BuiltInFunction func = ComputeEnvironment.builtIn.get(identifierName);
+          int numArgs = func.getNumArgs();
+          NumberValue[] args = new NumberValue[numArgs];
+          int argNum = 0;
+
+          while (currentToken.value.getTokenType() == TokenTypes.NUMBER ||
+              currentToken.value.getTokenType() == TokenTypes.IDENTIFIER){
+            args[argNum] = computeExpression(0);
+            System.out.println(args[argNum].toString());
+
+            if (argNum < numArgs - 1) {
+              expectToken(TokenTypes.COMMA);
+              nextToken();
+            }
+
+            argNum++;
+          }
+
+          System.out.println("Got args");
+          expectToken(TokenTypes.CLOSE_PAREN);
+          nextToken();
+
+          result = env.builtIn.get(identifierName).invoke(args);
+
+        }
+        else{
+          throw new UnkownIdentifierException("Unknown identifier: " + identifierName);
+        }
       }
       else{
         //Referencing a variable
-        System.out.println(parameters.get(identifierName));
         if (parameters.containsKey(identifierName)){
           result = assignedParams[parameters.get(identifierName)];
         }
@@ -129,6 +177,7 @@ public class Function {
     }
     else{
       assignedParams = args;
+      //TODO do more parsing to add support for piece-wise functions
 
       return computeExpression(0);
     }

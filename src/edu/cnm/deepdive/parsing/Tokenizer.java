@@ -66,6 +66,10 @@ public final class Tokenizer {
           result.addLast(TokenTypes.EQUALS);
           break;
         }
+        case ',':{
+          result.addLast(TokenTypes.COMMA);
+          break;
+        }
         case '(': {
           result.addLast(TokenTypes.OPEN_PAREN);
           break;
@@ -104,6 +108,7 @@ public final class Tokenizer {
               toTokenize.substring(currentIndex - charCount, currentIndex));
 
           result.addLast(new NumberToken(new Real(parsedValue)));
+          break;
         }
         default: {
           int charCount = 0;

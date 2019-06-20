@@ -2,6 +2,7 @@ package edu.cnm.deepdive.math;
 
 public class MathUtil {
   //TODO implement methods for complexdual types
+  //TODO fix log function
   public static Real log(Real in){
     return new Real(Math.log(in.getValue()));
   }
@@ -20,6 +21,25 @@ public class MathUtil {
     double imaginary = Math.atan(b / a);
 
     return new Complex(real, imaginary);
+  }
+
+  public static NumberValue log(NumberValue in){
+    NumberValue result;
+
+    if (in instanceof Real){
+      result = log((Real)in);
+    }
+    else if(in instanceof Dual){
+      result = log((Dual)in);
+    }
+    else if(in instanceof Complex){
+      result = log((Complex)in);
+    }
+    else{
+      result = null;
+    }
+
+    return result;
   }
 
   public static Real log10(Real in){
@@ -43,6 +63,25 @@ public class MathUtil {
     return new Complex(real / denom, imaginary / denom);
   }
 
+  public static NumberValue log10(NumberValue in){
+    NumberValue result;
+
+    if (in instanceof Real){
+      result = log10((Real)in);
+    }
+    else if(in instanceof Dual){
+      result = log10((Dual)in);
+    }
+    else if(in instanceof Complex){
+      result = log10((Complex)in);
+    }
+    else{
+      result = null;
+    }
+
+    return result;
+  }
+
   public static Real cos(Real in){
     return new Real(Math.cos(in.getValue()));
   }
@@ -59,6 +98,25 @@ public class MathUtil {
     double imaginary = -Math.sin(in.real().getValue()) * Math.sinh(in.imaginary().getValue());
 
     return new Complex(real, imaginary);
+  }
+
+  public static NumberValue cos(NumberValue in){
+    NumberValue result;
+
+    if (in instanceof Real){
+      result = cos((Real)in);
+    }
+    else if(in instanceof Dual){
+      result = cos((Dual)in);
+    }
+    else if(in instanceof Complex){
+      result = cos((Complex)in);
+    }
+    else{
+      result = null;
+    }
+
+    return result;
   }
 
   public static Real sin(Real in){
@@ -79,6 +137,25 @@ public class MathUtil {
     return new Complex(real, imaginary);
   }
 
+  public static NumberValue sin(NumberValue in){
+    NumberValue result;
+
+    if (in instanceof Real){
+      result = sin((Real)in);
+    }
+    else if(in instanceof Dual){
+      result = sin((Dual)in);
+    }
+    else if(in instanceof Complex){
+      result = sin((Complex)in);
+    }
+    else{
+      result = null;
+    }
+
+    return result;
+  }
+
   public static Real tan(Real in){
     return new Real(Math.tan(in.getValue()));
   }
@@ -97,5 +174,24 @@ public class MathUtil {
     double imaginary = Math.sinh(2 * in.imaginary().getValue()) / denom;
 
     return new Complex(real, imaginary);
+  }
+
+  public static NumberValue tan(NumberValue in){
+    NumberValue result;
+
+    if (in instanceof Real){
+      result = tan((Real)in);
+    }
+    else if(in instanceof Dual){
+      result = tan((Dual)in);
+    }
+    else if(in instanceof Complex){
+      result = tan((Complex)in);
+    }
+    else{
+      result = null;
+    }
+
+    return result;
   }
 }

@@ -89,6 +89,11 @@ public class Complex implements NumberValue<Complex> {
     return result;
   }
 
+  @Override
+  public String toString(){
+    return String.format("%f + i%f", real().getValue(), imaginary().getValue());
+  }
+
   public static Complex from(Real real){
     return new Complex(real.getValue(), 0);
   }

@@ -79,6 +79,11 @@ public class Dual implements NumberValue<Dual> {
     return result;
   }
 
+  @Override
+  public String toString(){
+    return String.format("%f + E%f", real().getValue(), dual().getValue());
+  }
+
   public static Dual from(Real real){
     return new Dual(real.getValue(), 0);
   }

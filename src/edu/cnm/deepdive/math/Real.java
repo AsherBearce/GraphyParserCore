@@ -86,6 +86,11 @@ public class Real implements NumberValue<Real> {
     return result;
   }
 
+  @Override
+  public String toString(){
+    return String.format("%f", value);
+  }
+
   public static Real from(Real value) {
     return value;
   }

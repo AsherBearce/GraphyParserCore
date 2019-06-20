@@ -1,7 +1,6 @@
 package edu.cnm.deepdive.token;
 
 import edu.cnm.deepdive.math.NumberValue;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 public enum OperatorTokens implements Token, Operator {
   PLUS((NumberValue lhs, NumberValue rhs)-> lhs.add(rhs),
