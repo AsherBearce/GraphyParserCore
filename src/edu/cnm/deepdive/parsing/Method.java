@@ -1,6 +1,8 @@
 package edu.cnm.deepdive.parsing;
 
-import edu.cnm.deepdive.math.Complex;
+import edu.cnm.deepdive.exception.ParseException;
+import edu.cnm.deepdive.exception.UnexpectedTokenException;
+import edu.cnm.deepdive.exception.UnkownIdentifierException;
 import edu.cnm.deepdive.math.NumberValue;
 import edu.cnm.deepdive.token.IdentifierToken;
 import edu.cnm.deepdive.token.NumberToken;
@@ -10,7 +12,7 @@ import edu.cnm.deepdive.token.TokenTypes;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class Function {
+public class Method implements Callable {
   private String identifier;
   private TokenList tokens;
   private int numArgs;
@@ -19,7 +21,7 @@ public class Function {
   private NumberValue[] assignedParams;
   private final ComputeEnvironment env;
 
-  public Function(String indentifier, LinkedList<Token> tokens, int numArgs, ComputeEnvironment env,
+  public Method(String indentifier, LinkedList<Token> tokens, int numArgs, ComputeEnvironment env,
       HashMap<String, Integer> params){
     this.identifier = identifier;
     this.tokens = new TokenList(tokens);
@@ -47,11 +49,34 @@ public class Function {
     return currentToken.value;
   }
 
-  private void expectToken(Token expected) throws UnexpectedTokenException{
+  private void expectToken(Token expected) throws UnexpectedTokenException {
     if (expected.getTokenType() !=  currentToken.value.getTokenType()){
       throw new UnexpectedTokenException("Expected " + expected.getTokenType() + ", got "
           + currentToken.value.getTokenType());
     }
+  }
+
+  private NumberValue[] getArgs(Callable func) throws ParseException {
+    int numArgs = func.getNumArgs();
+    NumberValue[] args = new NumberValue[numArgs];
+    int argNum = 0;
+
+    while (currentToken.value.getTokenType() == TokenTypes.NUMBER ||
+        currentToken.value.getTokenType() == TokenTypes.IDENTIFIER){
+      args[argNum] = computeExpression(0);
+
+      if (argNum < numArgs - 1) {
+        expectToken(TokenTypes.COMMA);
+        nextToken();
+      }
+
+      argNum++;
+    }
+
+    expectToken(TokenTypes.CLOSE_PAREN);
+    nextToken();
+
+    return args;
   }
 
   private NumberValue computeAtom() throws ParseException{
@@ -74,24 +99,13 @@ public class Function {
     }
     else{
       //This token is an identifier, which may be followed by an opening paren, an expression, and a closing paren
-      //TODO retrieve value from either a function, or a variable.
       String identifierName = ((IdentifierToken) currentToken.value).getValue();
       if (nextToken().getTokenType() == TokenTypes.OPEN_PAREN){
         //Calling a function within an expression.
         if (env != null && env.getFunction(identifierName) != null){
           //Get all the arguments for this guy.
-          Function func = env.getFunction(identifierName);
-          NumberValue[] args = new NumberValue[func.getNumArgs()];
-          int argNum = 0;
-
-          /*while (currentToken.value.getTokenType() == TokenTypes.NUMBER ||
-            currentToken.value.getTokenType() == TokenTypes.IDENTIFIER){
-            args[argNum] = computeExpression(0);
-            nextToken();
-            expectToken(TokenTypes.COMMA);
-            nextToken();
-            argNum++;
-          }*/
+          Method func = env.getFunction(identifierName);
+          NumberValue[] args = getArgs(func);
 
           result = env.getFunction(identifierName).invoke(args);
         }
@@ -99,27 +113,8 @@ public class Function {
           //Check if the function is part of the built in functions
           nextToken();
 
-          BuiltInFunction func = ComputeEnvironment.builtIn.get(identifierName);
-          int numArgs = func.getNumArgs();
-          NumberValue[] args = new NumberValue[numArgs];
-          int argNum = 0;
-
-          while (currentToken.value.getTokenType() == TokenTypes.NUMBER ||
-              currentToken.value.getTokenType() == TokenTypes.IDENTIFIER){
-            args[argNum] = computeExpression(0);
-            System.out.println(args[argNum].toString());
-
-            if (argNum < numArgs - 1) {
-              expectToken(TokenTypes.COMMA);
-              nextToken();
-            }
-
-            argNum++;
-          }
-
-          System.out.println("Got args");
-          expectToken(TokenTypes.CLOSE_PAREN);
-          nextToken();
+          BuiltInMethods func = ComputeEnvironment.builtIn.get(identifierName);
+          NumberValue[] args = getArgs(func);
 
           result = env.builtIn.get(identifierName).invoke(args);
 
@@ -178,8 +173,16 @@ public class Function {
     else{
       assignedParams = args;
       //TODO do more parsing to add support for piece-wise functions
-
-      return computeExpression(0);
+      NumberValue result = computeExpression(0);
+      currentToken = tokens.getFirst();
+      return result;
     }
+  }
+
+  public static NumberValue computeConstant(LinkedList<Token> constTokens, ComputeEnvironment env) throws ParseException{
+    Method tempMethod = new Method("", constTokens, 0, env, null);
+    NumberValue result = tempMethod.computeExpression(0);
+    tempMethod = null;
+    return result;
   }
 }

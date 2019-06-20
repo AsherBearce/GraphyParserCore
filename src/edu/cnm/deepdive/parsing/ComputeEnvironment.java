@@ -1,19 +1,20 @@
 package edu.cnm.deepdive.parsing;
 
+import edu.cnm.deepdive.exception.ParseException;
+import edu.cnm.deepdive.exception.UnexpectedTokenException;
 import edu.cnm.deepdive.math.NumberValue;
 import edu.cnm.deepdive.token.IdentifierToken;
 import edu.cnm.deepdive.token.Token;
 import edu.cnm.deepdive.token.TokenTypes;
 import java.util.HashMap;
 import java.util.LinkedList;
-import static edu.cnm.deepdive.math.MathUtil.*;
 
 public class ComputeEnvironment {
   private TokenList.TokenContainer currentToken;
   private TokenList tokens;
-  private HashMap<String, Function> functions;
+  private HashMap<String, Method> functions;
   private HashMap<String, NumberValue> variables;
-  public static HashMap<String, BuiltInFunction> builtIn;
+  public static HashMap<String, BuiltInMethods> builtIn;
 
   public ComputeEnvironment(){
     //this.tokens = new TokenList(tokens);
@@ -23,12 +24,23 @@ public class ComputeEnvironment {
 
     if (builtIn == null){
       builtIn = new HashMap<>();
-      builtIn.put("log", BuiltInFunction.LOG);
-      builtIn.put("log10", BuiltInFunction.LOG_10);
-      builtIn.put("cos", BuiltInFunction.COS);
-      builtIn.put("sin", BuiltInFunction.SIN);
-      builtIn.put("tan", BuiltInFunction.TAN);
-      builtIn.put("test", BuiltInFunction.TEST);
+      builtIn.put("log", BuiltInMethods.LOG);
+      builtIn.put("log10", BuiltInMethods.LOG_10);
+      builtIn.put("cos", BuiltInMethods.COS);
+      builtIn.put("sin", BuiltInMethods.SIN);
+      builtIn.put("tan", BuiltInMethods.TAN);
+    }
+  }
+
+  private Token nextToken(){
+    currentToken = currentToken.next;
+    return currentToken.value;
+  }
+
+  private void expectToken(Token expected) throws UnexpectedTokenException {
+    if (expected.getTokenType() !=  currentToken.value.getTokenType()){
+      throw new UnexpectedTokenException("Expected " + expected.getTokenType() + ", got "
+          + currentToken.value.getTokenType());
     }
   }
 
@@ -45,8 +57,8 @@ public class ComputeEnvironment {
     return result;
   }
 
-  public Function getFunction(String identifier){
-    Function result;
+  public Method getFunction(String identifier){
+    Method result;
 
     if (functions.containsKey(identifier)){
       result = functions.get(identifier);
@@ -58,18 +70,76 @@ public class ComputeEnvironment {
     return result;
   }
 
-  public void ParseStatement() throws UnexpectedTokenException{
+  public void clearContent(){
+
+  }
+
+  public void parseStatement(LinkedList<Token> tokenList) throws ParseException {
+    tokens = new TokenList(tokenList);
+    currentToken = tokens.getFirst();
+
     if (currentToken.value.getTokenType() == TokenTypes.IDENTIFIER){
       String identifierName = ((IdentifierToken) currentToken.value).getValue();
+
       if (functions.containsKey(identifierName) || variables.containsKey(identifierName)){
-        //Do a compute expression, not sure where to put it.
+        //Do a compute expression, put it into a new anonymous variable.
+        NumberValue newVar = Method.computeConstant(tokens.tokenLinkedList(), this);
+        String anonymousName = String.format("$%d", variables.size());
+
+        variables.put(anonymousName, newVar);
       }
       else{
         //Other wise, we're declaring either a new variable or function.
+        nextToken();
+        if (currentToken.value.getTokenType() == TokenTypes.OPEN_PAREN){
+          //Define a new function
+          nextToken();
+          HashMap<String, Integer> parameters = new HashMap<>();
+          int paramNumber = 0;
+
+          while (currentToken.value.getTokenType() == TokenTypes.IDENTIFIER){
+            String varName = ((IdentifierToken) currentToken.value).getValue();
+
+            parameters.put(varName, paramNumber);
+            nextToken();
+
+            if (currentToken.value.getTokenType() == TokenTypes.COMMA){
+              nextToken();
+            }
+
+            paramNumber++;
+          }
+
+          expectToken(TokenTypes.CLOSE_PAREN);
+          nextToken();
+          expectToken(TokenTypes.EQUALS);
+          nextToken();
+
+          //make a new token list starting from currentToken to the end of the list of tokens.
+        }
+        else{
+          //Define a new variable
+          nextToken();
+          expectToken(TokenTypes.EQUALS);
+          nextToken();
+
+          NumberValue newVar = Method.computeConstant(tokens.tokenLinkedList(), this);
+          String anonymousName = String.format("$%d", variables.size());
+
+          variables.put(anonymousName, newVar);
+        }
       }
-    }
-    else{
 
     }
+    else{
+      //Do the same thing as we did for declaring a new variable but give it an anonymous name such as $a
+      NumberValue newVar = Method.computeConstant(tokens.tokenLinkedList(), this);
+      String anonymousName = String.format("$%d", variables.size());
+
+      variables.put(anonymousName, newVar);
+    }
+
+    tokens = null;
+    currentToken = null;
   }
 }

@@ -26,6 +26,20 @@ public class TokenList {
     }
   }
 
+  public LinkedList<Token> tokenLinkedList(){
+    TokenContainer currentElement = this.first;
+    LinkedList<Token> result = new LinkedList<>();
+
+    while (currentElement != this.last){
+      result.addLast(currentElement.value);
+      currentElement = currentElement.next;
+    }
+
+    result.addLast(currentElement.value);
+
+    return result;
+  }
+
   public void addLast(Token value){
     TokenContainer newNode = new TokenContainer(value);
     count++;
