@@ -71,7 +71,8 @@ public class ComputeEnvironment {
   }
 
   public void clearContent(){
-
+    functions.clear();
+    variables.clear();
   }
 
   public void parseStatement(LinkedList<Token> tokenList) throws ParseException {
@@ -114,17 +115,34 @@ public class ComputeEnvironment {
           nextToken();
           expectToken(TokenTypes.EQUALS);
           nextToken();
-
           //make a new token list starting from currentToken to the end of the list of tokens.
+          LinkedList<Token> toks = new LinkedList<>();
+
+          while (currentToken.value.getTokenType() != TokenTypes.END){
+            toks.addLast(currentToken.value);
+            nextToken();
+          }
+          toks.addLast(TokenTypes.END);
+
+          Method func = new Method(identifierName, toks, paramNumber, this, parameters);
+          functions.put(identifierName, func);
         }
         else{
           //Define a new variable
-          nextToken();
           expectToken(TokenTypes.EQUALS);
           nextToken();
 
-          NumberValue newVar = Method.computeConstant(tokens.tokenLinkedList(), this);
-          String anonymousName = String.format("$%d", variables.size());
+          LinkedList<Token> toks = new LinkedList<>();
+
+          while (currentToken.value != TokenTypes.END){
+            toks.addLast(currentToken.value);
+            nextToken();
+          }
+
+          toks.addLast(TokenTypes.END);
+
+          NumberValue newVar = Method.computeConstant(toks, this);
+          String anonymousName = String.format(identifierName, variables.size());
 
           variables.put(anonymousName, newVar);
         }
@@ -133,6 +151,7 @@ public class ComputeEnvironment {
     }
     else{
       //Do the same thing as we did for declaring a new variable but give it an anonymous name such as $a
+
       NumberValue newVar = Method.computeConstant(tokens.tokenLinkedList(), this);
       String anonymousName = String.format("$%d", variables.size());
 

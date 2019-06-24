@@ -10,12 +10,10 @@ import edu.cnm.deepdive.token.Token;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-//This code is around 1300 lines.
-
 public class ParsingTest {
 
   public static void main(String[] args) throws ParseException {
-    /*String toParse = "log(x)";
+    /*String toParse = "20 * 3 + 9";
     LinkedList<Token> tokens = new Tokenizer(toParse).Tokenize();
 
     for (Token t : tokens){
@@ -29,16 +27,25 @@ public class ParsingTest {
     Real arg = new Real(5);
 
     NumberValue<Real> result = func.invoke(arg);
-    //System.out.println(result);
 
     System.out.println(((Real)result).getValue());*/
 
-    String toParse = "f(x, y, z) = cos(x) * sin(y) + z";
     ComputeEnvironment environment = new ComputeEnvironment();
-    LinkedList<Token> tokens = new Tokenizer(toParse).Tokenize();
 
+    String varDeclaration = "PI = 3.14159265358979323";
+    String toParse = "f(x, y, z) = PI * (cos(x) * sin(y) + z)";
+
+    LinkedList<Token> tokens = new Tokenizer(varDeclaration).Tokenize();
 
     environment.parseStatement(tokens);
 
+    tokens = new Tokenizer(toParse).Tokenize();
+
+    environment.parseStatement(tokens);
+
+    NumberValue result =
+        environment.getFunction("f").invoke(new Real(Math.PI / 3), new Real(Math.PI / 3), new Real(2));
+
+    System.out.println(result.toString());
   }
 }
