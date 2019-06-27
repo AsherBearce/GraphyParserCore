@@ -14,11 +14,21 @@ import java.util.LinkedList;
 public class ParsingTest {
 
   public static void main(String[] args) throws ParseException {
-    String toParse = "f(x) = cos(x)";
+    String toParse = "f(x) = a * cos(x)";
+    String toParse1 = "a = 3.141519";
 
     ComputeEnvironment env = new ComputeEnvironment();
     LinkedList<Token> tokens = new Tokenizer(toParse).Tokenize();
+    LinkedList<Token> tokens1 = new Tokenizer(toParse1).Tokenize();
     Function func = new Parser(tokens).parseStatement();
+    Function func1 = new Parser(tokens1).parseStatement();
+
+    env.putFunction(func);
+    env.putFunction(func1);
+
+    if (env.getFunction("a") != null){
+      System.out.println("Okay weird");
+    }
 
     Real result = (Real)func.invoke(new Real(Math.PI));
 

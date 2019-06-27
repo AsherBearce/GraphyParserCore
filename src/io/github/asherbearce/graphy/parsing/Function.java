@@ -23,8 +23,8 @@ public class Function extends TokenHandler implements Callable {
     this.env = env;
   }
 
-  public Function(String indentifier, LinkedList<Token> tokens, int numArgs,
-      HashMap<String, Integer> params){
+  public Function(
+      String identifier, LinkedList<Token> tokens, int numArgs, HashMap<String, Integer> params){
     super(tokens);
     this.identifier = identifier;
     this.tokens = new TokenList(tokens);
