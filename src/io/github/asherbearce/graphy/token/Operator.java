@@ -1,6 +1,6 @@
-package edu.cnm.deepdive.token;
+package io.github.asherbearce.graphy.token;
 
-import edu.cnm.deepdive.math.NumberValue;
+import io.github.asherbearce.graphy.math.NumberValue;
 
 public interface Operator {
   //TODO Refactor so that all the floats here take in a Number class, or some other wrapper type instead.

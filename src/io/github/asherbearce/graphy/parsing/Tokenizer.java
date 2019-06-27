@@ -1,12 +1,11 @@
-package edu.cnm.deepdive.parsing;
+package io.github.asherbearce.graphy.parsing;
 
-import edu.cnm.deepdive.math.Real;
-import edu.cnm.deepdive.token.IdentifierToken;
-import edu.cnm.deepdive.token.NumberToken;
-import edu.cnm.deepdive.token.Operator;
-import edu.cnm.deepdive.token.OperatorTokens;
-import edu.cnm.deepdive.token.Token;
-import edu.cnm.deepdive.token.TokenTypes;
+import io.github.asherbearce.graphy.math.Real;
+import io.github.asherbearce.graphy.token.IdentifierToken;
+import io.github.asherbearce.graphy.token.NumberToken;
+import io.github.asherbearce.graphy.token.OperatorTokens;
+import io.github.asherbearce.graphy.token.Token;
+import io.github.asherbearce.graphy.token.TokenTypes;
 import java.util.LinkedList;
 
 //TODO add identifiers and complex numbers to the tokenizing process

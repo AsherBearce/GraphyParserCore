@@ -1,35 +1,36 @@
-package edu.cnm.deepdive.parsing;
+package io.github.asherbearce.graphy.parsing;
 
-import edu.cnm.deepdive.exception.ParseException;
-import edu.cnm.deepdive.exception.UnexpectedTokenException;
-import edu.cnm.deepdive.exception.UnkownIdentifierException;
-import edu.cnm.deepdive.math.NumberValue;
-import edu.cnm.deepdive.token.IdentifierToken;
-import edu.cnm.deepdive.token.NumberToken;
-import edu.cnm.deepdive.token.OperatorTokens;
-import edu.cnm.deepdive.token.Token;
-import edu.cnm.deepdive.token.TokenTypes;
+import io.github.asherbearce.graphy.exception.ParseException;
+import io.github.asherbearce.graphy.exception.UnkownIdentifierException;
+import io.github.asherbearce.graphy.math.NumberValue;
+import io.github.asherbearce.graphy.token.IdentifierToken;
+import io.github.asherbearce.graphy.token.NumberToken;
+import io.github.asherbearce.graphy.token.OperatorTokens;
+import io.github.asherbearce.graphy.token.Token;
+import io.github.asherbearce.graphy.token.TokenTypes;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class Method implements Callable {
+public class Function extends TokenHandler implements Callable {
   private String identifier;
-  private TokenList tokens;
   private int numArgs;
   private HashMap<String, Integer> parameters;
   private TokenList.TokenContainer currentToken;
   private NumberValue[] assignedParams;
-  private final ComputeEnvironment env;
+  private ComputeEnvironment env;
 
-  public Method(String indentifier, LinkedList<Token> tokens, int numArgs, ComputeEnvironment env,
+  public void setEnv(ComputeEnvironment env) {
+    this.env = env;
+  }
+
+  public Function(String indentifier, LinkedList<Token> tokens, int numArgs,
       HashMap<String, Integer> params){
+    super(tokens);
     this.identifier = identifier;
     this.tokens = new TokenList(tokens);
     this.numArgs = numArgs;
-    this.env = env;
     this.parameters = params;
     assignedParams = new NumberValue[numArgs];
-    currentToken = this.tokens.getFirst();
   }
 
   public String getIdentifier() {
@@ -44,25 +45,13 @@ public class Method implements Callable {
     return numArgs;
   }
 
-  private Token nextToken(){
-    currentToken = currentToken.next;
-    return currentToken.value;
-  }
-
-  private void expectToken(Token expected) throws UnexpectedTokenException {
-    if (expected.getTokenType() !=  currentToken.value.getTokenType()){
-      throw new UnexpectedTokenException("Expected " + expected.getTokenType() + ", got "
-          + currentToken.value.getTokenType());
-    }
-  }
-
   private NumberValue[] getArgs(Callable func) throws ParseException {
     int numArgs = func.getNumArgs();
     NumberValue[] args = new NumberValue[numArgs];
     int argNum = 0;
 
-    while (currentToken.value.getTokenType() == TokenTypes.NUMBER ||
-        currentToken.value.getTokenType() == TokenTypes.IDENTIFIER){
+    while (getCurrent().getTokenType() == TokenTypes.NUMBER ||
+        getCurrent().getTokenType() == TokenTypes.IDENTIFIER){
       args[argNum] = computeExpression(0);
 
       if (argNum < numArgs - 1) {
@@ -82,29 +71,29 @@ public class Method implements Callable {
   private NumberValue computeAtom() throws ParseException{
     NumberValue result;
 
-    if (currentToken.value.getTokenType() == TokenTypes.NUMBER){
-      result = ((NumberToken)currentToken.value).getValue();
+    if (getCurrent().getTokenType() == TokenTypes.NUMBER){
+      result = ((NumberToken)getCurrent()).getValue();
       nextToken();
     }
-    else if (currentToken.value.getTokenType() == TokenTypes.OPEN_PAREN){
+    else if (getCurrent().getTokenType() == TokenTypes.OPEN_PAREN){
       nextToken();
       result = computeExpression(0);
       expectToken(TokenTypes.CLOSE_PAREN);
       nextToken();
     }
-    else if (currentToken.value.getTokenType() == TokenTypes.OPERATOR){
-      OperatorTokens operator = (OperatorTokens)currentToken.value;
+    else if (getCurrent().getTokenType() == TokenTypes.OPERATOR){
+      OperatorTokens operator = (OperatorTokens)getCurrent();
       nextToken();
       result = operator.computeUnaryOperation(computeExpression(0));
     }
     else{
       //This token is an identifier, which may be followed by an opening paren, an expression, and a closing paren
-      String identifierName = ((IdentifierToken) currentToken.value).getValue();
+      String identifierName = ((IdentifierToken)getCurrent()).getValue();
       if (nextToken().getTokenType() == TokenTypes.OPEN_PAREN){
         //Calling a function within an expression.
         if (env != null && env.getFunction(identifierName) != null){
           //Get all the arguments for this guy.
-          Method func = env.getFunction(identifierName);
+          Function func = env.getFunction(identifierName);
           NumberValue[] args = getArgs(func);
 
           result = env.getFunction(identifierName).invoke(args);
@@ -116,7 +105,7 @@ public class Method implements Callable {
           BuiltInMethods func = ComputeEnvironment.builtIn.get(identifierName);
           NumberValue[] args = getArgs(func);
 
-          result = env.builtIn.get(identifierName).invoke(args);
+          result = ComputeEnvironment.builtIn.get(identifierName).invoke(args);
 
         }
         else{
@@ -128,8 +117,8 @@ public class Method implements Callable {
         if (parameters.containsKey(identifierName)){
           result = assignedParams[parameters.get(identifierName)];
         }
-        else if (env != null && env.getVariable(identifierName) != null){
-          result = env.getVariable(identifierName);
+        else if (env != null && env.getFunction(identifierName) != null){
+          result = env.getFunction(identifierName).invoke();
         }
         else{
           //Throw an exception
@@ -145,9 +134,9 @@ public class Method implements Callable {
   private NumberValue computeExpression(int minPrecedence) throws ParseException{
     NumberValue result = computeAtom();
 
-    while (currentToken.value.getTokenType() == TokenTypes.OPERATOR &&
-        ((OperatorTokens)currentToken.value).getPrecedence() >= minPrecedence){
-      OperatorTokens operator = (OperatorTokens)currentToken.value;
+    while (getCurrent().getTokenType() == TokenTypes.OPERATOR &&
+        ((OperatorTokens)getCurrent()).getPrecedence() >= minPrecedence){
+      OperatorTokens operator = (OperatorTokens)getCurrent();
       int prec = operator.getPrecedence();
       boolean isLeftAssociative = operator.isLeftAssociative();
       int nextMinPrec;
@@ -177,12 +166,5 @@ public class Method implements Callable {
       currentToken = tokens.getFirst();
       return result;
     }
-  }
-
-  public static NumberValue computeConstant(LinkedList<Token> constTokens, ComputeEnvironment env) throws ParseException{
-    Method tempMethod = new Method("", constTokens, 0, env, null);
-    NumberValue result = tempMethod.computeExpression(0);
-    tempMethod = null;
-    return result;
   }
 }

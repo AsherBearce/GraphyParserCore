@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.token;
+package io.github.asherbearce.graphy.token;
 
 public enum TokenTypes implements Token {
   NUMBER,

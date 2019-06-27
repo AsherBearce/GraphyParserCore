@@ -1,6 +1,6 @@
-package edu.cnm.deepdive.token;
+package io.github.asherbearce.graphy.token;
 
-import edu.cnm.deepdive.math.NumberValue;
+import io.github.asherbearce.graphy.math.NumberValue;
 
 public enum OperatorTokens implements Token, Operator {
   PLUS((NumberValue lhs, NumberValue rhs)-> lhs.add(rhs),

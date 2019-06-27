@@ -1,6 +1,4 @@
-package edu.cnm.deepdive.exception;
-
-import edu.cnm.deepdive.exception.ParseException;
+package io.github.asherbearce.graphy.exception;
 
 public class UnkownIdentifierException extends ParseException {
   public UnkownIdentifierException(String msg){

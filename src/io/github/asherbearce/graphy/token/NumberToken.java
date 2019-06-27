@@ -1,6 +1,6 @@
-package edu.cnm.deepdive.token;
+package io.github.asherbearce.graphy.token;
 
-import edu.cnm.deepdive.math.NumberValue;
+import io.github.asherbearce.graphy.math.NumberValue;
 
 public class NumberToken implements Token {
 

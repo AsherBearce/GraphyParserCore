@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.math;
+package io.github.asherbearce.graphy.math;
 
 public class Dual implements NumberValue<Dual> {
   private final double real;

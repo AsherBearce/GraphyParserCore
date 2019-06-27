@@ -1,15 +1,15 @@
-package edu.cnm.deepdive.parsing;
+package io.github.asherbearce.graphy.parsing;
 
-import edu.cnm.deepdive.exception.ParseException;
-import edu.cnm.deepdive.math.NumberValue;
-import static edu.cnm.deepdive.math.MathUtil.*;
+import io.github.asherbearce.graphy.exception.ParseException;
+import io.github.asherbearce.graphy.math.NumberValue;
+import io.github.asherbearce.graphy.math.MathUtil;
 
 public enum BuiltInMethods implements Callable {
-  LOG((NumberValue... args) -> cos(args[0]), 1),
-  LOG_10((NumberValue... args) ->  log10(args[0]), 1),
-  COS((NumberValue... args) -> cos(args[0]), 1),
-  SIN((NumberValue... args) -> sin(args[0]), 1),
-  TAN((NumberValue... args) -> tan(args[0]), 1);
+  LOG((NumberValue... args) -> MathUtil.log(args[0]), 1),
+  LOG_10((NumberValue... args) ->  MathUtil.log10(args[0]), 1),
+  COS((NumberValue... args) -> MathUtil.cos(args[0]), 1),
+  SIN((NumberValue... args) -> MathUtil.sin(args[0]), 1),
+  TAN((NumberValue... args) -> MathUtil.tan(args[0]), 1);
 
   private Invokable method;
   private int numArgs;

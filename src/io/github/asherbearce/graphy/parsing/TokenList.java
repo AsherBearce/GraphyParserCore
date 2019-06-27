@@ -1,6 +1,6 @@
-package edu.cnm.deepdive.parsing;
+package io.github.asherbearce.graphy.parsing;
 
-import edu.cnm.deepdive.token.Token;
+import io.github.asherbearce.graphy.token.Token;
 import java.util.LinkedList;
 
 public class TokenList {

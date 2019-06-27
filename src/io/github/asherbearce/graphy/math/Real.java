@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.math;
+package io.github.asherbearce.graphy.math;
 
 public class Real implements NumberValue<Real> {
 

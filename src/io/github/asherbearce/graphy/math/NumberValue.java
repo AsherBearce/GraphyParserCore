@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.math;
+package io.github.asherbearce.graphy.math;
 
 public interface NumberValue<T extends NumberValue> {
   T add(T rhs);
